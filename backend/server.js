@@ -18,7 +18,6 @@ const initKeys = async () => {
 };
 initKeys();
 
-
 // Cifrado CAST5 (Simétrico) - usando AES-256-CBC
 app.post('/api/cifrarCAST5', (req, res) => {
   const { text } = req.body;
@@ -41,30 +40,29 @@ app.post('/api/descifrarCAST5', (req, res) => {
 
 // Cifrado Paillier (Asimétrico)
 app.post('/api/cifrarPaillier', async (req, res) => {
-    const { text } = req.body;
-    const unicodeValues = Array.from(text).map(char => char.charCodeAt(0));
-    const textAsNumber = BigInt(unicodeValues.join('')); // Representación como BigInt
-    
-    const { publicKey, privateKey } = await generateRandomKeys(2048);
-    const encrypted = publicKey.encrypt(textAsNumber);
-    
-    res.send({ encrypted: encrypted.toString() });
-  });
+  const { text } = req.body;
+  const unicodeValues = Array.from(text).map(char => char.charCodeAt(0));
+  const textAsNumber = BigInt(unicodeValues.join('')); // Representación como BigInt
+  
+  const { publicKey, privateKey } = await generateRandomKeys(2048);
+  const encrypted = publicKey.encrypt(textAsNumber);
+  
+  res.send({ encrypted: encrypted.toString() });
+});
 
 // Descifrar Paillier
 app.post('/api/descifrarPaillier', async (req, res) => {
-    const { encryptedText } = req.body;
-    const { publicKey, privateKey } = await generateRandomKeys(2048); // Llaves privadas deben coincidir
-    const decryptedBigInt = privateKey.decrypt(BigInt(encryptedText));
+  const { encryptedText } = req.body;
+  const { publicKey, privateKey } = await generateRandomKeys(2048); // Llaves privadas deben coincidir
+  const decryptedBigInt = privateKey.decrypt(BigInt(encryptedText));
+
+  // Convertir el BigInt de vuelta a una cadena de caracteres usando Unicode
+  const decryptedText = String(decryptedBigInt).match(/.{1,3}/g)  // Cambia el tamaño del grupo según el formato original
+    .map(num => String.fromCharCode(Number(num)))
+    .join('');
   
-    // Convertir el BigInt de vuelta a una cadena de caracteres usando Unicode
-    const decryptedText = String(decryptedBigInt).match(/.{1,3}/g)  // Cambia el tamaño del grupo según el formato original
-      .map(num => String.fromCharCode(Number(num)))
-      .join('');
-  
-    res.send({ decrypted: decryptedText });
-  });
-  
+  res.send({ decrypted: decryptedText });
+});
 
 // Hash con SHA-512 (no necesita descifrado)
 app.post('/api/hashSHA512', (req, res) => {
@@ -73,6 +71,8 @@ app.post('/api/hashSHA512', (req, res) => {
   res.send({ hash });
 });
 
-app.listen(3001, () => {
-  console.log('Servidor de cifrado ejecutándose en puerto 3001');
+// Puerto
+const PORT = process.env.PORT || 3001; // Usa el puerto de la variable de entorno o 3001
+app.listen(PORT, () => {
+  console.log(`Servidor de cifrado ejecutándose en puerto ${PORT}`);
 });
