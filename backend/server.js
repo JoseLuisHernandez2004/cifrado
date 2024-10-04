@@ -18,6 +18,11 @@ const initKeys = async () => {
 };
 initKeys();
 
+// Ruta raíz
+app.get('/', (req, res) => {
+  res.send('Servidor de cifrado en funcionamiento');
+});
+
 // Cifrado CAST5 (Simétrico) - usando AES-256-CBC
 app.post('/api/cifrarCAST5', (req, res) => {
   const { text } = req.body;
