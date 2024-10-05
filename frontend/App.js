@@ -16,7 +16,7 @@ function App() {
     const routeMap = {
       'CAST5': '/api/cifrarCAST5',
       'Paillier': '/api/cifrarPaillier',
-      'Skein': '/api/hashSHA512'
+      'Skein': '/api/hashSHA512'    
     };
 
     try {

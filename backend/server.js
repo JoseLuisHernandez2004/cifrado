@@ -5,7 +5,12 @@ const crypto = require('crypto');
 const { generateRandomKeys } = require('paillier-bigint'); // Paillier
 
 const app = express();
-app.use(cors());
+
+// Configuración de CORS para permitir solo solicitudes desde tu frontend en Netlify
+app.use(cors({
+  origin: 'https://cifrados.netlify.app'  // El dominio de tu frontend
+}));
+
 app.use(bodyParser.json());
 
 // Almacena la clave para CAST5
