@@ -10,7 +10,7 @@ function App() {
   const [result, setResult] = useState('');
 
   // URL del backend desplegado en Render
-  const baseURL = 'https://cifrado-sxwd.onrender.com';
+  const baseURL = 'https://cifrado-sxwd.onrender.com';  // Asegúrate de que esta sea la URL correcta de Render
 
   const handleEncrypt = async () => {
     const routeMap = {

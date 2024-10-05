@@ -8,7 +8,7 @@ const app = express();
 
 // Configuración de CORS para permitir solo solicitudes desde tu frontend en Netlify
 app.use(cors({
-  origin: 'https://cifrados.netlify.app',  // El dominio de tu frontend
+  origin: 'https://cifrados.netlify.app',  // Reemplaza con tu dominio de Netlify
   methods: ['GET', 'POST'],
 }));
 
@@ -20,7 +20,12 @@ let cast5Key = null;
 let paillierKeys = null;
 
 const initKeys = async () => {
-  paillierKeys = await generateRandomKeys(2048);
+  try {
+    paillierKeys = await generateRandomKeys(2048);
+    console.log("Claves Paillier generadas correctamente");
+  } catch (error) {
+    console.error("Error al generar claves Paillier:", error);
+  }
 };
 initKeys();
 
@@ -54,25 +59,41 @@ app.post('/api/cifrarPaillier', async (req, res) => {
   const { text } = req.body;
   const unicodeValues = Array.from(text).map(char => char.charCodeAt(0));
   const textAsNumber = BigInt(unicodeValues.join('')); // Representación como BigInt
-  
-  const { publicKey, privateKey } = await generateRandomKeys(2048);
-  const encrypted = publicKey.encrypt(textAsNumber);
-  
-  res.send({ encrypted: encrypted.toString() });
+
+  if (!paillierKeys) {
+    return res.status(500).send({ error: "Claves Paillier no inicializadas" });
+  }
+
+  try {
+    const encrypted = paillierKeys.publicKey.encrypt(textAsNumber);
+    res.send({ encrypted: encrypted.toString() });
+  } catch (error) {
+    console.error("Error durante el cifrado Paillier:", error);
+    res.status(500).send({ error: "Error durante el cifrado Paillier" });
+  }
 });
 
 // Descifrar Paillier
 app.post('/api/descifrarPaillier', async (req, res) => {
   const { encryptedText } = req.body;
-  const { publicKey, privateKey } = await generateRandomKeys(2048); // Llaves privadas deben coincidir
-  const decryptedBigInt = privateKey.decrypt(BigInt(encryptedText));
 
-  // Convertir el BigInt de vuelta a una cadena de caracteres usando Unicode
-  const decryptedText = String(decryptedBigInt).match(/.{1,3}/g)  // Cambia el tamaño del grupo según el formato original
-    .map(num => String.fromCharCode(Number(num)))
-    .join('');
-  
-  res.send({ decrypted: decryptedText });
+  if (!paillierKeys) {
+    return res.status(500).send({ error: "Claves Paillier no inicializadas" });
+  }
+
+  try {
+    const decryptedBigInt = paillierKeys.privateKey.decrypt(BigInt(encryptedText));
+
+    // Convertir el BigInt de vuelta a una cadena de caracteres usando Unicode
+    const decryptedText = String(decryptedBigInt).match(/.{1,3}/g)  // Cambia el tamaño del grupo según el formato original
+      .map(num => String.fromCharCode(Number(num)))
+      .join('');
+
+    res.send({ decrypted: decryptedText });
+  } catch (error) {
+    console.error("Error durante el descifrado Paillier:", error);
+    res.status(400).send({ error: "Error durante el descifrado Paillier" });
+  }
 });
 
 // Hash con SHA-512 (no necesita descifrado)
