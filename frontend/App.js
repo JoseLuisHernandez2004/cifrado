@@ -9,6 +9,9 @@ function App() {
   const [selectedMethod, setSelectedMethod] = useState('CAST5');
   const [result, setResult] = useState('');
 
+  // URL del backend desplegado en Render
+  const baseURL = 'https://cifrado-sxwd.onrender.com';
+
   const handleEncrypt = async () => {
     const routeMap = {
       'CAST5': '/api/cifrarCAST5',
@@ -17,7 +20,7 @@ function App() {
     };
 
     try {
-      const response = await axios.post(`http://localhost:3001${routeMap[selectedMethod]}`, {
+      const response = await axios.post(`${baseURL}${routeMap[selectedMethod]}`, {
         text: inputText
       });
 
@@ -39,7 +42,7 @@ function App() {
     }
 
     try {
-      const response = await axios.post(`http://localhost:3001${routeMap[selectedMethod]}`, {
+      const response = await axios.post(`${baseURL}${routeMap[selectedMethod]}`, {
         encryptedText: result
       });
 
@@ -66,7 +69,7 @@ function App() {
 
       <div className="action-buttons">
         <button onClick={handleEncrypt}>Cifrar</button>
-        <button onClick={handleDecrypt}>Descifrar</button> {/* Nuevo botón para descifrar */}
+        <button onClick={handleDecrypt}>Descifrar</button>
       </div>
 
       <h3>Resultado:</h3>
