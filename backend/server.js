@@ -8,7 +8,8 @@ const app = express();
 
 // Configuración de CORS para permitir solo solicitudes desde tu frontend en Netlify
 app.use(cors({
-  origin: 'https://cifrados.netlify.app'  // El dominio de tu frontend
+  origin: 'https://cifrados.netlify.app',  // El dominio de tu frontend
+  methods: ['GET', 'POST'],
 }));
 
 app.use(bodyParser.json());
