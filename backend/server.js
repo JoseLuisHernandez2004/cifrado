@@ -8,12 +8,12 @@ const app = express();
 
 // Configuración de CORS para permitir solo solicitudes desde tu frontend en Netlify
 app.use(cors({
-  origin: 'https://cifrados.netlify.app',  // Reemplaza con tu dominio de Netlify
+  origin: 'https://cifrados.netlify.app',
   methods: ['GET', 'POST'],
 }));
 
 app.use(bodyParser.json());
-
+  
 // Almacena la clave para CAST5
 let cast5Key = null;
 // Genera las claves Paillier una sola vez
